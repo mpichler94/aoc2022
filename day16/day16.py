@@ -1,6 +1,9 @@
+import itertools
 import re
 from collections import namedtuple
 from aocd.models import Puzzle
+import nographs as nog
+
 
 Valve = namedtuple('Valve', ['name', 'flow', 'connections'])
 
@@ -26,63 +29,74 @@ def parse_input(data):
     return valves
 
 
-def best_path(pos, distances, remaining_valves, rem_time):
-    pressures = []
-    for valve in remaining_valves:
+def best_path(valves, rem_time):
+    max_flow = 0
+    for valve in valves.values():
+        max_flow += valve.flow
 
-        distance = distances[pos.name][valve.name]
+    closed_valves = []
+    for name, valve in valves.items():
+        if valve.flow > 0:
+            closed_valves.append(name)
 
-        if distance >= rem_time:
-            continue
+    def next_edges(state, _):
+        pos, closed, flow = state
 
-        pressure = valve.flow * (rem_time - distance - 1)
+        if pos in closed:
+            yield (pos, closed.difference({pos}), flow + valves[pos].flow), (max_flow - flow)
+        for valve in valves[pos].connections:
+            yield (valve.name, closed, flow), (max_flow - flow)
 
-        remaining = list(remaining_valves)
-        remaining.remove(valve)
-        pressures.append(pressure + best_path(valve, distances, remaining, rem_time - distance - 1))
-
-    if len(pressures) == 0:
-        return 0
-
-    return max(pressures)
+    traversal = nog.TraversalShortestPaths(next_edges)
+    for state in traversal.start_from(('AA', frozenset(closed_valves), 0)):
+        pos, closed, flow = state
+        if traversal.depth == rem_time or not closed:
+            return max_flow * rem_time - traversal.distance
 
 
-def get_paths(pos, valves):
-    todo = [(pos, 0)]
-    lengths = {pos.name: 0}
+def best_path_2(valves, rem_time):
+    max_flow = 0
+    for valve in valves.values():
+        max_flow += valve.flow
 
-    while len(todo) > 0:
-        if len(lengths) >= len(valves):
-            break
-        node, length = todo.pop(0)
-        if node.name not in lengths:
-            lengths[node.name] = length
+    closed_valves = []
+    for name, valve in valves.items():
+        if valve.flow > 0:
+            closed_valves.append(name)
 
-        for child in node.connections:
-            todo.append((child, length+1))
+    def next_edges(state, _):
+        pos, closed, flow = state
 
-    return lengths
+        if pos in closed:
+            yield (pos, closed.difference({pos}), flow + valves[pos].flow), (max_flow - flow)
+        for valve in valves[pos].connections:
+            yield (valve.name, closed, flow), (max_flow - flow)
+
+    def next_edges_b(state, _):
+        pos1, pos2, closed, flow = state
+
+        for state1, state2 in itertools.product(next_edges((pos1, closed, flow), _), next_edges((pos2, closed, flow), _)):
+            (pos1, closed1, flow1), weight1 = state1
+            (pos2, closed2, flow2), weight2 = state2
+
+            if state1[0] != state2[0] or closed1 == closed:
+                yield (pos1, pos2, closed1.intersection(closed2), flow1 + flow2 - flow), weight1
+
+    traversal = nog.TraversalShortestPaths(next_edges_b)
+    for state in traversal.start_from((('AA', 'AA', frozenset(closed_valves), 0))):
+        pos1, pos2, closed, flow = state
+        if traversal.depth == rem_time or not closed:
+            return max_flow * rem_time - traversal.distance
 
 
 def part_a(valves):
 
-    distances = {}
-    for name, valve in valves.items():
-        if name == 'AA' or valve.flow > 0:
-            distances[name] = get_paths(valve, valves)
-
-    remaining_valves = []
-    for valve in valves.values():
-        if valve.flow > 0:
-            remaining_valves.append(valve)
-
-    return best_path(valves['AA'], distances, remaining_valves, 30)
+    return best_path(valves, 30)
 
 
-def part_b(sensors):
+def part_b(valves):
 
-    x, y = free_tile(sensors)
-    print(f'[b] tuning frequency = {x * 4000000 + y}')
+    return best_path_2(valves, 26)
 
 
 def main():
@@ -93,19 +107,21 @@ def main():
     print(f'[a] example: {solution}')
     solution = part_a(sensors)
     print(f'[a] solution: {solution}')
-    print('Answer [a]? (y, n): ')
-    if input() == 'y':
-        puzzle.answer_a = solution
+    if not puzzle.answered_a:
+        print('Answer [a]? (y, n): ')
+        if input() == 'y':
+            puzzle.answer_a = solution
 
     print('')
 
     solution = part_b(ex_sensors)
     print(f'[b] example: {solution}')
     solution = part_b(sensors)
-    print(f'[b] example: {solution}')
-    print('Answer [b]? (y, n): ')
-    if input() == 'y':
-        puzzle.answer_b = solution
+    print(f'[b] solution: {solution}')
+    if not puzzle.answered_b:
+        print('Answer [b]? (y, n): ')
+        if input() == 'y':
+            puzzle.answer_b = solution
 
 
 if __name__ == '__main__':
