@@ -85,7 +85,10 @@ class Day:
         print('Start test ...')
         t = timeit.default_timer()
         passed_tests = 0
-        tests = [(puzzle.example_data, self.example_answer(), "Example")]
+        example_text = self.example_input()
+        if example_text is None:
+            example_text = puzzle.example_data
+        tests = [(example_text, self.example_answer(), "Example")]
         tests.extend(self.tests())
         for text, result_ok, *more in tests:
             passed = self.execute_test(text, result_ok, more)
@@ -133,6 +136,9 @@ class Day:
         print()
 
     def example_answer(self):
+        return None
+
+    def example_input(self):
         return None
 
     @staticmethod
