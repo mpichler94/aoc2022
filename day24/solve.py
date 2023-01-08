@@ -110,4 +110,5 @@ class PartB(PartA):
     def example_answer(self):
         return 54
 
+
 Day.do_day(24, 2022, PartA, PartB)
