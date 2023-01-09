@@ -23,6 +23,9 @@ class PartA(Day):
     def compute(self, data):
         return sum(data.table[i] for i in data.rounds)
 
+    def example_answer(self):
+        return 15
+
 
 class PartB(PartA):
     def config(self, data):
@@ -37,6 +40,9 @@ class PartB(PartA):
             'CY': 6,
             'CZ': 7
         }
+
+    def example_answer(self):
+        return 12
 
 
 Day.do_day(2, 2022, PartA, PartB)

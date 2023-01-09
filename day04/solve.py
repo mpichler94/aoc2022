@@ -30,6 +30,9 @@ class PartA(Day):
 
         return section1, section2
 
+    def example_answer(self):
+        return 2
+
 
 class PartB(PartA):
     def compute(self, data):
@@ -42,6 +45,9 @@ class PartB(PartA):
                 sum += 1
 
         return sum
+
+    def example_answer(self):
+        return 4
 
 
 Day.do_day(4, 2022, PartA, PartB)

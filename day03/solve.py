@@ -25,6 +25,9 @@ class PartA(Day):
         else:
             return ord(char) - 97 + 1
 
+    def example_answer(self):
+        return 157
+
 
 class PartB(PartA):
     def compute(self, data):
@@ -41,6 +44,9 @@ class PartB(PartA):
                 sum += self.convert_to_num(badge.pop())
 
         return sum
+
+    def example_answer(self):
+        return 70
 
 
 Day.do_day(3, 2022, PartA, PartB)
