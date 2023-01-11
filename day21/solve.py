@@ -65,7 +65,8 @@ class PartB(PartA):
 
         return int(new_monkeys['humn'].get_result(new_monkeys))
 
-    def reorder(self, monkey, target):
+    @staticmethod
+    def reorder(monkey, target):
         parts = monkey.operation.split(' ')
         left = parts[0]
         right = parts[2]
@@ -86,11 +87,6 @@ class PartB(PartA):
             return f'{left} / {monkey.name}'
 
         raise RuntimeError('Cannot reorder operation')
-
-
-
-
-
 
     def example_answer(self):
         return 301

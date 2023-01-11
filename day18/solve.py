@@ -1,38 +1,14 @@
 import itertools
 
 from utils.aoc_base import Day
-import numpy as np
 
 
 class PartA(Day):
 
     def parse(self, text: str, data):
         lines = text.splitlines()
-
-        cubes = np.zeros((len(lines), 3), dtype=int)
-        cubes = []
-        for i, line in enumerate(lines):
-            cube = []
-            for j, v in enumerate(line.strip().split(',')):
-                #cubes[i, j] = int(v)
-                cube.append(int(v))
-
-            cubes.append(cube)
-
+        cubes = [[int(v) for v in line.strip().split(',')] for line in lines]
         data.cubes = cubes
-
-    def compute2(self, data):
-        touching = 0
-        seen = []
-
-        for i in range(len(data.cubes)):
-            for cube2 in seen:
-                if self.is_touching(data.cubes[i], cube2):
-                    touching += 1
-
-            seen.append(data.cubes[i])
-
-        return len(data.cubes) * 6 - touching * 2
 
     @staticmethod
     def is_touching(cube, cube2):
@@ -41,7 +17,6 @@ class PartA(Day):
 
     def compute(self, data):
         touching = 0
-
         for cube, cube2 in itertools.combinations(data.cubes, 2):
             if cube == cube2:
                 continue
@@ -53,6 +28,7 @@ class PartA(Day):
 
     def example_answer(self):
         return 64
+
 
 class PartB(PartA):
     def config(self, data):
@@ -97,15 +73,13 @@ class PartB(PartA):
             todo.append([cube[0], cube[1], cube[2]-1])
 
         for i in range(len(data.cubes)):
-            for cube2 in exterior:
-                if self.is_touching(data.cubes[i], cube2):
-                    touching += 1
-
+            touching += sum(1 for cube2 in exterior if self.is_touching(data.cubes[i], cube2))
             seen.append(data.cubes[i])
 
         return touching
 
     def example_answer(self):
         return 58
+
 
 Day.do_day(18, 2022, PartA, PartB)

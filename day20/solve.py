@@ -25,7 +25,8 @@ class PartA(Day):
         num3 = data.numbers[(i + 3000) % len(data.numbers)][0]
         return num1 + num2 + num3
 
-    def mix(self, data, original_numbers):
+    @staticmethod
+    def mix(data, original_numbers):
         for idx in range(len(data.numbers)):
             value = original_numbers[idx]
             num = value[0]

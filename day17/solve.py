@@ -6,8 +6,6 @@ from utils.aoc_base import Day
 class PartA(Day):
 
     def parse(self, text, data):
-        if text.startswith('#'):
-            text = '>>><<><>><<<>><>>><<<>>><<<><<<>><>><<>>'
         data.text = text.strip().strip('\n')
         data.jets = [-1 if c == '<' else 1 for c in data.text]
         data.jet_iterator = itertools.cycle(enumerate(data.jets))
@@ -74,7 +72,8 @@ class PartA(Day):
         if not self.check_collision(rock, [new_x, rock_pos[1]], cave):
             rock_pos[0] = new_x
 
-    def check_collision(self, rock, rock_pos, cave):
+    @staticmethod
+    def check_collision(rock, rock_pos, cave):
         for x in range(len(rock)):
             for y in range(len(rock[0])):
                 if rock[x][y] == 0:
@@ -86,7 +85,8 @@ class PartA(Day):
 
         return False
 
-    def update_cave(self, rock, rock_pos, cave):
+    @staticmethod
+    def update_cave(rock, rock_pos, cave):
         for y in range(len(rock[0])-1, -1, -1):
             for x in range(len(rock)):
                 if rock[x][y] == 0:
@@ -98,7 +98,8 @@ class PartA(Day):
 
                 cave[y_pos][rock_pos[0] + x] = 1
 
-    def check_touchdown(self, rock, rock_pos, heights):
+    @staticmethod
+    def check_touchdown(rock, rock_pos, heights):
         for x in range(len(rock)):
             for y in range(len(rock[0])):
                 if rock[x][y] == 0:
@@ -111,6 +112,9 @@ class PartA(Day):
 
     def example_answer(self):
         return 3068
+
+    def example_input(self):
+        return '>>><<><>><<<>><>>><<<>>><<<><<<>><>><<>>'
 
 
 class PartB(PartA):

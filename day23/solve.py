@@ -82,13 +82,15 @@ class PartA(Day):
                     data.elves[(x, y)] = Elf(i, (x, y))
                     i += 1
 
+    def config(self, data):
+        data.num_rounds = 10
+
     def compute(self, data):
         i = 0
-        elves = list(data.elves.values())
         while True:
             any_moved = self.do_round(data)
             i += 1
-            if not any_moved or i >= 10:
+            if not any_moved or i >= data.num_rounds:
                 break
 
         return self.get_bounds(data)
@@ -96,14 +98,9 @@ class PartA(Day):
     @staticmethod
     def do_round(data):
         elves = list(data.elves.values())
-        for elf in elves:
-            elf.prepare_move(data.elves)
-
-        any_moved = False
-        for elf in elves:
-            any_moved |= elf.move(data.elves)
-
-        return any_moved
+        [elf.prepare_move(data.elves) for elf in elves]
+        any_moved = sum(elf.move(data.elves) for elf in elves)
+        return bool(any_moved)
 
     @staticmethod
     def get_bounds(data):
